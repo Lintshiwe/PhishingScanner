@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}PhishingScanner - Free Security Tool{% endblock %}
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Custom CSS -->
+    <style>
+      :root {
+        --primary-color: #0d6efd;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --success-color: #198754;
+        --dark-color: #212529;
+      }
+
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .main-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin: 2rem auto;
+        padding: 2rem;
+      }
+
+      .scan-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .scan-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .risk-badge {
+        font-size: 1.1em;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+      }
+
+      .risk-critical {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+      }
+      .risk-high {
+        background: linear-gradient(45deg, #ffa726, #fb8c00);
+      }
+      .risk-medium {
+        background: linear-gradient(45deg, #ffeb3b, #fbc02d);
+      }
+      .risk-low {
+        background: linear-gradient(45deg, #42a5f5, #1976d2);
+      }
+      .risk-safe {
+        background: linear-gradient(45deg, #66bb6a, #388e3c);
+      }
+
+      .loading-spinner {
+        display: none;
+      }
+
+      .result-container {
+        display: none;
+        margin-top: 2rem;
+      }
+
+      .indicator-item {
+        background: rgba(255, 193, 7, 0.1);
+        border-left: 4px solid var(--warning-color);
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        border-radius: 0 8px 8px 0;
+      }
+
+      .btn-gradient {
+        background: linear-gradient(45deg, var(--primary-color), #0056b3);
+        border: none;
+        transition: all 0.3s ease;
+      }
+
+      .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
+      }
+
+      .feature-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .hero-section {
+        text-align: center;
+        padding: 3rem 0;
+        color: white;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .hero-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+      }
+    </style>
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+          <i class="fas fa-shield-alt text-primary"></i>
+          PhishingScanner
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/dashboard"
+                ><i class="fas fa-chart-line"></i> Dashboard</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/api"
+                ><i class="fas fa-code"></i> API</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">{% block content %}{% endblock %}</div>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-5">
+      <div class="container">
+        <p class="text-white mb-2">
+          <i class="fas fa-shield-alt"></i>
+          PhishingScanner v1.0 - Free Open Source Security Tool
+        </p>
+        <p class="text-white-50 small">
+          Built by Slade for the cybersecurity community
+        </p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

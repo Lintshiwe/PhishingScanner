@@ -1,0 +1,26 @@
+# Sample URLs for testing PhishingScanner
+# One URL per line, lines starting with # are comments
+
+# Safe, well-known websites
+https://github.com
+https://google.com
+https://microsoft.com
+https://stackoverflow.com
+https://python.org
+https://wikipedia.org
+
+# Educational institutions
+https://mit.edu
+https://stanford.edu
+
+# Popular services
+https://netflix.com
+https://amazon.com
+
+# Technology companies
+https://apple.com
+https://facebook.com
+https://twitter.com
+
+# Note: These are legitimate websites for testing purposes
+# The scanner should classify them as low-risk

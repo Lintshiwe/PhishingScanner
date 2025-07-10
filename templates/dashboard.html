@@ -1,0 +1,462 @@
+{% extends "base.html" %} {% block title %}Analytics Dashboard -
+PhishingScanner{% endblock %} {% block content %}
+<div class="hero-section">
+  <div class="container">
+    <h1 class="hero-title">
+      <i class="fas fa-chart-line"></i>
+      Analytics Dashboard
+    </h1>
+    <p class="hero-subtitle">
+      📊 Real-time scanning statistics and threat analysis
+    </p>
+  </div>
+</div>
+
+<div class="main-container">
+  <!-- Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body text-center">
+          <i class="fas fa-shield-alt fa-3x mb-2"></i>
+          <h4 id="totalScans">0</h4>
+          <p class="mb-0">Total Scans</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-danger text-white">
+        <div class="card-body text-center">
+          <i class="fas fa-exclamation-triangle fa-3x mb-2"></i>
+          <h4 id="phishingDetected">0</h4>
+          <p class="mb-0">Phishing Detected</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body text-center">
+          <i class="fas fa-check-circle fa-3x mb-2"></i>
+          <h4 id="safeSites">0</h4>
+          <p class="mb-0">Safe Sites</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body text-center">
+          <i class="fas fa-clock fa-3x mb-2"></i>
+          <h4 id="avgResponseTime">0s</h4>
+          <p class="mb-0">Avg Response Time</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-pie-chart"></i> Threat Distribution</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="threatChart" width="400" height="400"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-chart-bar"></i> Risk Score Distribution</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="riskChart" width="400" height="400"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5><i class="fas fa-history"></i> Recent Scanning Activity</h5>
+          <div>
+            <button
+              class="btn btn-outline-primary btn-sm"
+              onclick="exportData('json')"
+            >
+              <i class="fas fa-download"></i> Export JSON
+            </button>
+            <button
+              class="btn btn-outline-secondary btn-sm"
+              onclick="exportData('csv')"
+            >
+              <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+            <button
+              class="btn btn-outline-success btn-sm"
+              onclick="refreshData()"
+            >
+              <i class="fas fa-sync"></i> Refresh
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="recentActivity">
+            <div class="text-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p>Loading recent activity...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Threat Intelligence -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-brain"></i> Threat Intelligence</h5>
+        </div>
+        <div class="card-body">
+          <div id="threatIntel">
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              Threat intelligence data will be displayed here based on recent
+              scans.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-tools"></i> System Status</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-6">
+              <div class="p-3">
+                <i class="fas fa-server fa-2x text-success"></i>
+                <p class="mt-2 mb-0"><strong>Scanner Engine</strong></p>
+                <span class="badge bg-success">Online</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="fas fa-database fa-2x text-success"></i>
+                <p class="mt-2 mb-0"><strong>Database</strong></p>
+                <span class="badge bg-success">Connected</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="fas fa-globe fa-2x text-success"></i>
+                <p class="mt-2 mb-0"><strong>DNS Resolver</strong></p>
+                <span class="badge bg-success">Active</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3">
+                <i class="fas fa-lock fa-2x text-success"></i>
+                <p class="mt-2 mb-0"><strong>SSL Checker</strong></p>
+                <span class="badge bg-success">Operational</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  let threatChart, riskChart
+
+  function initCharts() {
+    // Threat Distribution Pie Chart
+    const threatCtx = document.getElementById('threatChart').getContext('2d')
+    threatChart = new Chart(threatCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Safe Sites', 'Phishing Detected'],
+        datasets: [
+          {
+            data: [0, 0],
+            backgroundColor: [
+              'rgba(40, 167, 69, 0.8)',
+              'rgba(220, 53, 69, 0.8)',
+            ],
+            borderColor: ['rgba(40, 167, 69, 1)', 'rgba(220, 53, 69, 1)'],
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+        },
+      },
+    })
+
+    // Risk Score Distribution Bar Chart
+    const riskCtx = document.getElementById('riskChart').getContext('2d')
+    riskChart = new Chart(riskCtx, {
+      type: 'bar',
+      data: {
+        labels: [
+          'Safe (0-19)',
+          'Low (20-39)',
+          'Medium (40-59)',
+          'High (60-79)',
+          'Critical (80-100)',
+        ],
+        datasets: [
+          {
+            label: 'Number of Sites',
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: [
+              'rgba(40, 167, 69, 0.8)',
+              'rgba(23, 162, 184, 0.8)',
+              'rgba(255, 193, 7, 0.8)',
+              'rgba(255, 133, 27, 0.8)',
+              'rgba(220, 53, 69, 0.8)',
+            ],
+            borderColor: [
+              'rgba(40, 167, 69, 1)',
+              'rgba(23, 162, 184, 1)',
+              'rgba(255, 193, 7, 1)',
+              'rgba(255, 133, 27, 1)',
+              'rgba(220, 53, 69, 1)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      },
+    })
+  }
+
+  function updateStats(stats) {
+    document.getElementById('totalScans').textContent = stats.total_scans
+    document.getElementById('phishingDetected').textContent =
+      stats.phishing_detected
+    document.getElementById('safeSites').textContent = stats.safe_sites
+    document.getElementById('avgResponseTime').textContent =
+      stats.average_response_time + 's'
+  }
+
+  function updateCharts(history) {
+    // Update threat distribution
+    const safeSites = history.filter((scan) => !scan.is_phishing).length
+    const phishingSites = history.filter((scan) => scan.is_phishing).length
+
+    threatChart.data.datasets[0].data = [safeSites, phishingSites]
+    threatChart.update()
+
+    // Update risk distribution
+    const riskDistribution = [0, 0, 0, 0, 0] // Safe, Low, Medium, High, Critical
+    history.forEach((scan) => {
+      const score = scan.risk_score
+      if (score < 20) riskDistribution[0]++
+      else if (score < 40) riskDistribution[1]++
+      else if (score < 60) riskDistribution[2]++
+      else if (score < 80) riskDistribution[3]++
+      else riskDistribution[4]++
+    })
+
+    riskChart.data.datasets[0].data = riskDistribution
+    riskChart.update()
+  }
+
+  function displayRecentActivity(history) {
+    const activityDiv = document.getElementById('recentActivity')
+
+    if (history.length === 0) {
+      activityDiv.innerHTML = `
+            <div class="text-center text-muted">
+                <i class="fas fa-inbox fa-3x mb-3"></i>
+                <p>No scanning activity yet. <a href="/">Start scanning</a> to see analytics.</p>
+            </div>
+        `
+      return
+    }
+
+    let html = `
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th class="text-center">Risk Score</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Response Time</th>
+                        <th class="text-center">Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `
+
+    history.reverse().forEach((scan) => {
+      const riskBadge = getRiskBadge(scan.risk_score)
+      const statusBadge = scan.is_phishing
+        ? '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> Phishing</span>'
+        : '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Safe</span>'
+
+      html += `
+            <tr>
+                <td>
+                    <a href="${
+                      scan.url
+                    }" target="_blank" class="text-decoration-none">
+                        ${
+                          scan.url.length > 60
+                            ? scan.url.substring(0, 60) + '...'
+                            : scan.url
+                        }
+                    </a>
+                </td>
+                <td class="text-center">${riskBadge}</td>
+                <td class="text-center">${statusBadge}</td>
+                <td class="text-center">${scan.response_time}s</td>
+                <td class="text-center">${new Date(
+                  scan.timestamp
+                ).toLocaleString()}</td>
+            </tr>
+        `
+    })
+
+    html += '</tbody></table></div>'
+    activityDiv.innerHTML = html
+  }
+
+  function getRiskBadge(riskScore) {
+    if (riskScore >= 80)
+      return `<span class="badge bg-danger">${riskScore}</span>`
+    if (riskScore >= 60)
+      return `<span class="badge bg-warning">${riskScore}</span>`
+    if (riskScore >= 40)
+      return `<span class="badge bg-info">${riskScore}</span>`
+    if (riskScore >= 20)
+      return `<span class="badge bg-primary">${riskScore}</span>`
+    return `<span class="badge bg-success">${riskScore}</span>`
+  }
+
+  function generateThreatIntel(history) {
+    const intelDiv = document.getElementById('threatIntel')
+
+    if (history.length === 0) {
+      intelDiv.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                No data available for threat intelligence analysis.
+            </div>
+        `
+      return
+    }
+
+    const phishingSites = history.filter((scan) => scan.is_phishing)
+    const totalScans = history.length
+    const phishingRate = ((phishingSites.length / totalScans) * 100).toFixed(1)
+
+    let html = `
+        <div class="alert alert-warning">
+            <h6><i class="fas fa-exclamation-triangle"></i> Threat Summary</h6>
+            <p class="mb-1">Phishing Detection Rate: <strong>${phishingRate}%</strong></p>
+            <p class="mb-0">Based on ${totalScans} recent scans</p>
+        </div>
+    `
+
+    if (phishingSites.length > 0) {
+      html += `
+            <div class="alert alert-danger">
+                <h6><i class="fas fa-shield-alt"></i> Recent Threats</h6>
+                <ul class="mb-0">
+        `
+
+      phishingSites.slice(0, 3).forEach((site) => {
+        html += `<li>${site.url} (Risk: ${site.risk_score}/100)</li>`
+      })
+
+      html += '</ul></div>'
+    }
+
+    intelDiv.innerHTML = html
+  }
+
+  function refreshData() {
+    // Show loading state
+    document.getElementById('recentActivity').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Refreshing data...</p>
+        </div>
+    `
+
+    Promise.all([
+      fetch('/api/stats').then((r) => r.json()),
+      fetch('/api/history').then((r) => r.json()),
+    ])
+      .then(([stats, history]) => {
+        updateStats(stats)
+        updateCharts(history)
+        displayRecentActivity(history)
+        generateThreatIntel(history)
+      })
+      .catch((error) => {
+        console.error('Error refreshing data:', error)
+        document.getElementById('recentActivity').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                Error loading data: ${error.message}
+            </div>
+        `
+      })
+  }
+
+  function exportData(format) {
+    window.open(`/export/${format}`, '_blank')
+  }
+
+  // Initialize dashboard
+  document.addEventListener('DOMContentLoaded', function () {
+    initCharts()
+    refreshData()
+
+    // Auto-refresh every 30 seconds
+    setInterval(refreshData, 30000)
+  })
+</script>
+{% endblock %}

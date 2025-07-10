@@ -1,0 +1,79 @@
+{
+    "scanner": {
+        "user_agent": "PhishingScanner/1.0 Security Tool",
+        "max_redirects": 5,
+        "verify_ssl": true
+    },
+    "thresholds": {
+        "risk_score": 70,
+        "ssl_days_threshold": 30,
+        "domain_age_threshold": 90,
+        "similarity_threshold": 0.8
+    },
+    "timeouts": {
+        "request_timeout": 10,
+        "dns_timeout": 5,
+        "ssl_timeout": 5
+    },
+    "features": {
+        "enable_screenshot": false,
+        "enable_ml_detection": false,
+        "enable_whois": true,
+        "enable_dns_checks": true,
+        "enable_ssl_analysis": true,
+        "enable_content_analysis": true
+    },
+    "api_keys": {
+        "virustotal": "",
+        "urlvoid": "",
+        "hybrid_analysis": "",
+        "comment": "Add your API keys here for enhanced detection"
+    },
+    "database": {
+        "type": "sqlite",
+        "path": "phishing_scanner.db",
+        "backup_enabled": true,
+        "retention_days": 30
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "phishing_scanner.log",
+        "max_size_mb": 10,
+        "backup_count": 5
+    },
+    "web_interface": {
+        "host": "0.0.0.0",
+        "port": 5000,
+        "debug": false,
+        "auto_refresh_interval": 30
+    },
+    "security": {
+        "rate_limiting": {
+            "enabled": false,
+            "requests_per_minute": 60,
+            "requests_per_hour": 1000
+        },
+        "cors": {
+            "enabled": true,
+            "origins": [
+                "*"
+            ]
+        }
+    },
+    "notifications": {
+        "email": {
+            "enabled": false,
+            "smtp_server": "",
+            "smtp_port": 587,
+            "username": "",
+            "password": "",
+            "from_address": "",
+            "to_addresses": []
+        },
+        "webhook": {
+            "enabled": false,
+            "url": "",
+            "headers": {}
+        }
+    }
+}

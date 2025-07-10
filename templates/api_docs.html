@@ -1,0 +1,544 @@
+{% extends "base.html" %} {% block title %}API Documentation - PhishingScanner{%
+endblock %} {% block content %}
+<div class="hero-section">
+  <div class="container">
+    <h1 class="hero-title">
+      <i class="fas fa-code"></i>
+      API Documentation
+    </h1>
+    <p class="hero-subtitle">
+      🔧 RESTful API for integrating phishing detection into your applications
+    </p>
+  </div>
+</div>
+
+<div class="main-container">
+  <div class="row">
+    <div class="col-md-3">
+      <!-- API Navigation -->
+      <div class="card sticky-top">
+        <div class="card-header">
+          <h5><i class="fas fa-list"></i> API Endpoints</h5>
+        </div>
+        <div class="card-body">
+          <nav class="nav flex-column">
+            <a class="nav-link" href="#overview">Overview</a>
+            <a class="nav-link" href="#authentication">Authentication</a>
+            <a class="nav-link" href="#scan-url">Scan URL</a>
+            <a class="nav-link" href="#batch-scan">Batch Scan</a>
+            <a class="nav-link" href="#history">Scan History</a>
+            <a class="nav-link" href="#stats">Statistics</a>
+            <a class="nav-link" href="#export">Export Data</a>
+            <a class="nav-link" href="#examples">Code Examples</a>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <!-- API Documentation Content -->
+
+      <!-- Overview -->
+      <section id="overview" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-info-circle"></i> API Overview</h3>
+          </div>
+          <div class="card-body">
+            <p>
+              The PhishingScanner API provides programmatic access to our
+              phishing detection engine. All endpoints return JSON responses and
+              use standard HTTP status codes.
+            </p>
+
+            <div class="alert alert-info">
+              <i class="fas fa-server"></i>
+              <strong>Base URL:</strong> <code>http://localhost:5000/api</code>
+            </div>
+
+            <h5>Response Format</h5>
+            <p>All API responses follow a consistent JSON format:</p>
+            <pre><code>{
+  "success": true,
+  "data": { ... },
+  "error": null,
+  "timestamp": "2025-01-01T12:00:00Z"
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Authentication -->
+      <section id="authentication" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-key"></i> Authentication</h3>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-success">
+              <i class="fas fa-unlock"></i>
+              <strong>No Authentication Required:</strong> This is a free,
+              open-source tool. No API keys or authentication tokens are
+              required for basic usage.
+            </div>
+
+            <p>For production deployments, consider implementing:</p>
+            <ul>
+              <li>Rate limiting</li>
+              <li>API key authentication</li>
+              <li>Request logging</li>
+              <li>IP whitelisting</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scan URL -->
+      <section id="scan-url" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-search"></i> Scan Single URL</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <strong>Endpoint:</strong><br />
+                <code>POST /api/scan</code>
+              </div>
+              <div class="col-md-8">
+                <strong>Description:</strong><br />
+                Analyze a single URL for phishing indicators
+              </div>
+            </div>
+
+            <h5 class="mt-3">Request Body</h5>
+            <pre><code>{
+  "url": "https://example.com"
+}</code></pre>
+
+            <h5>Response Example</h5>
+            <pre><code>{
+  "url": "https://example.com",
+  "timestamp": "2025-01-01T12:00:00Z",
+  "risk_score": 25,
+  "is_phishing": false,
+  "indicators": [
+    "Missing security headers"
+  ],
+  "response_time": 1.23,
+  "details": {
+    "ssl": {
+      "certificate": { ... }
+    },
+    "dns": { ... },
+    "http": { ... }
+  }
+}</code></pre>
+
+            <h5>Try It</h5>
+            <div class="api-test-section bg-light p-3 rounded">
+              <div class="input-group mb-2">
+                <input
+                  type="url"
+                  id="testUrl"
+                  class="form-control"
+                  placeholder="Enter URL to test"
+                  value="https://github.com"
+                />
+                <button class="btn btn-primary" onclick="testScanAPI()">
+                  Test API
+                </button>
+              </div>
+              <div id="scanApiResult"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Batch Scan -->
+      <section id="batch-scan" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-tasks"></i> Batch Scan URLs</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <strong>Endpoint:</strong><br />
+                <code>POST /api/batch-scan</code>
+              </div>
+              <div class="col-md-8">
+                <strong>Description:</strong><br />
+                Analyze multiple URLs simultaneously (max 50)
+              </div>
+            </div>
+
+            <h5 class="mt-3">Request Body</h5>
+            <pre><code>{
+  "urls": [
+    "https://example1.com",
+    "https://example2.com",
+    "https://example3.com"
+  ]
+}</code></pre>
+
+            <h5>Response Example</h5>
+            <pre><code>{
+  "results": [
+    {
+      "url": "https://example1.com",
+      "risk_score": 15,
+      "is_phishing": false,
+      "indicators": [],
+      "response_time": 0.98
+    },
+    {
+      "url": "https://example2.com",
+      "risk_score": 85,
+      "is_phishing": true,
+      "indicators": [
+        "Suspicious domain patterns",
+        "Missing SSL certificate"
+      ],
+      "response_time": 2.34
+    }
+  ]
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- History -->
+      <section id="history" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-history"></i> Scan History</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <strong>Endpoint:</strong><br />
+                <code>GET /api/history</code>
+              </div>
+              <div class="col-md-8">
+                <strong>Description:</strong><br />
+                Retrieve recent scan history (last 20 scans)
+              </div>
+            </div>
+
+            <h5 class="mt-3">Response Example</h5>
+            <pre><code>[
+  {
+    "url": "https://example.com",
+    "timestamp": "2025-01-01T12:00:00Z",
+    "risk_score": 25,
+    "is_phishing": false,
+    "response_time": 1.23
+  }
+]</code></pre>
+
+            <h5>Try It</h5>
+            <div class="api-test-section bg-light p-3 rounded">
+              <button class="btn btn-secondary" onclick="testHistoryAPI()">
+                Get History
+              </button>
+              <div id="historyApiResult" class="mt-2"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Statistics -->
+      <section id="stats" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-chart-bar"></i> Statistics</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <strong>Endpoint:</strong><br />
+                <code>GET /api/stats</code>
+              </div>
+              <div class="col-md-8">
+                <strong>Description:</strong><br />
+                Get scanning statistics and metrics
+              </div>
+            </div>
+
+            <h5 class="mt-3">Response Example</h5>
+            <pre><code>{
+  "total_scans": 1250,
+  "phishing_detected": 187,
+  "safe_sites": 1063,
+  "average_risk_score": 23.4,
+  "average_response_time": 1.67
+}</code></pre>
+
+            <h5>Try It</h5>
+            <div class="api-test-section bg-light p-3 rounded">
+              <button class="btn btn-info" onclick="testStatsAPI()">
+                Get Stats
+              </button>
+              <div id="statsApiResult" class="mt-2"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Export -->
+      <section id="export" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-download"></i> Export Data</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <strong>Endpoints:</strong><br />
+                <code>GET /export/json</code><br />
+                <code>GET /export/csv</code>
+              </div>
+              <div class="col-md-8">
+                <strong>Description:</strong><br />
+                Export scan history in JSON or CSV format
+              </div>
+            </div>
+
+            <p class="mt-3">
+              These endpoints return downloadable files containing the complete
+              scan history.
+            </p>
+
+            <div class="api-test-section bg-light p-3 rounded">
+              <a
+                href="/export/json"
+                class="btn btn-success me-2"
+                target="_blank"
+              >
+                <i class="fas fa-download"></i> Download JSON
+              </a>
+              <a href="/export/csv" class="btn btn-secondary" target="_blank">
+                <i class="fas fa-file-csv"></i> Download CSV
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Code Examples -->
+      <section id="examples" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-code"></i> Code Examples</h3>
+          </div>
+          <div class="card-body">
+            <!-- Python Example -->
+            <h5>Python</h5>
+            <pre><code>import requests
+import json
+
+# Scan a single URL
+def scan_url(url):
+    response = requests.post(
+        'http://localhost:5000/api/scan',
+        json={'url': url},
+        headers={'Content-Type': 'application/json'}
+    )
+    return response.json()
+
+# Example usage
+result = scan_url('https://example.com')
+print(f"Risk Score: {result['risk_score']}/100")
+print(f"Is Phishing: {result['is_phishing']}")
+
+# Batch scan
+def batch_scan(urls):
+    response = requests.post(
+        'http://localhost:5000/api/batch-scan',
+        json={'urls': urls},
+        headers={'Content-Type': 'application/json'}
+    )
+    return response.json()
+
+urls = ['https://site1.com', 'https://site2.com']
+results = batch_scan(urls)
+for result in results['results']:
+    print(f"{result['url']}: {result['risk_score']}/100")</code></pre>
+
+            <!-- JavaScript Example -->
+            <h5>JavaScript (Node.js)</h5>
+            <pre><code>const axios = require('axios');
+
+// Scan a single URL
+async function scanUrl(url) {
+    try {
+        const response = await axios.post('http://localhost:5000/api/scan', {
+            url: url
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error:', error.response.data);
+    }
+}
+
+// Example usage
+scanUrl('https://example.com').then(result => {
+    console.log(`Risk Score: ${result.risk_score}/100`);
+    console.log(`Is Phishing: ${result.is_phishing}`);
+});
+
+// Batch scan
+async function batchScan(urls) {
+    try {
+        const response = await axios.post('http://localhost:5000/api/batch-scan', {
+            urls: urls
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error:', error.response.data);
+    }
+}</code></pre>
+
+            <!-- cURL Example -->
+            <h5>cURL</h5>
+            <pre><code># Scan a single URL
+curl -X POST http://localhost:5000/api/scan \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+
+# Batch scan
+curl -X POST http://localhost:5000/api/batch-scan \
+  -H "Content-Type: application/json" \
+  -d '{"urls": ["https://site1.com", "https://site2.com"]}'
+
+# Get statistics
+curl http://localhost:5000/api/stats
+
+# Get history
+curl http://localhost:5000/api/history</code></pre>
+
+            <!-- PHP Example -->
+            <h5>PHP</h5>
+            <pre><code>&lt;?php
+function scanUrl($url) {
+    $data = json_encode(['url' => $url]);
+    
+    $ch = curl_init('http://localhost:5000/api/scan');
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Content-Length: ' . strlen($data)
+    ]);
+    
+    $result = curl_exec($ch);
+    curl_close($ch);
+    
+    return json_decode($result, true);
+}
+
+// Example usage
+$result = scanUrl('https://example.com');
+echo "Risk Score: " . $result['risk_score'] . "/100\n";
+echo "Is Phishing: " . ($result['is_phishing'] ? 'Yes' : 'No') . "\n";
+?&gt;</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Error Codes -->
+      <section id="errors" class="mb-5">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Error Codes</h3>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>HTTP Status</th>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>400</td>
+                  <td>Bad Request</td>
+                  <td>Invalid request format or missing required parameters</td>
+                </tr>
+                <tr>
+                  <td>429</td>
+                  <td>Too Many Requests</td>
+                  <td>Rate limit exceeded (if implemented)</td>
+                </tr>
+                <tr>
+                  <td>500</td>
+                  <td>Internal Server Error</td>
+                  <td>Server error during processing</td>
+                </tr>
+                <tr>
+                  <td>503</td>
+                  <td>Service Unavailable</td>
+                  <td>Scanner service temporarily unavailable</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  function displayApiResult(elementId, data, isError = false) {
+    const element = document.getElementById(elementId)
+    const className = isError ? 'alert-danger' : 'alert-success'
+    element.innerHTML = `
+        <div class="alert ${className} mt-2">
+            <pre><code>${JSON.stringify(data, null, 2)}</code></pre>
+        </div>
+    `
+  }
+
+  function testScanAPI() {
+    const url = document.getElementById('testUrl').value
+    if (!url) {
+      displayApiResult('scanApiResult', { error: 'Please enter a URL' }, true)
+      return
+    }
+
+    fetch('/api/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url }),
+    })
+      .then((response) => response.json())
+      .then((data) => displayApiResult('scanApiResult', data))
+      .catch((error) =>
+        displayApiResult('scanApiResult', { error: error.message }, true)
+      )
+  }
+
+  function testHistoryAPI() {
+    fetch('/api/history')
+      .then((response) => response.json())
+      .then((data) => displayApiResult('historyApiResult', data.slice(0, 3))) // Show only first 3
+      .catch((error) =>
+        displayApiResult('historyApiResult', { error: error.message }, true)
+      )
+  }
+
+  function testStatsAPI() {
+    fetch('/api/stats')
+      .then((response) => response.json())
+      .then((data) => displayApiResult('statsApiResult', data))
+      .catch((error) =>
+        displayApiResult('statsApiResult', { error: error.message }, true)
+      )
+  }
+</script>
+{% endblock %}
